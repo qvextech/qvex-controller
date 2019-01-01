@@ -1,5 +1,6 @@
 #include "HTTP.h"
 #include "SSDP.h"
+#include "Config.h"
 #include "Settings.h"
 #include "Controller.h"
 #include "UDP.h"
@@ -10,15 +11,38 @@ long QHTTP::mic1 = 0;
 
 void QHTTP::begin()
 {
+  //SSDP device description
   _HTTP.on("/description.xml", HTTP_GET, []() {
     QSSDP::schema(_HTTP.client());
   });
-  _HTTP.on("/settings", HTTP_POST, settings);
+
+  //Apply to device's settings
+  _HTTP.on("/set", HTTP_POST, set);
+
+  //Change color
   _HTTP.on("/color", HTTP_POST, colorReceived);
+
+  //Get device info
+  _HTTP.on("/getSettings",HTTP_GET, []() {
+    _HTTP.send(200, "text/plain", ConfigFile::readFileAsJSON());
+  });
+
+  //Request to start UDP channel
   _HTTP.on("/startUDP", HTTP_POST, []() {
+    if(_HTTP.arg("individual")=="1")Controller::setMode(2);
     UDPsocket::allow(_HTTP.arg("ip"));
     _HTTP.send(200, "text/plain", "OK");
   });
+
+  _HTTP.on("/endUDP", HTTP_POST, []() {
+    Controller::setMode(1);
+    UDPsocket::allow("");
+    _HTTP.send(200, "text/plain", "OK");
+  });
+
+
+
+
   _HTTP.begin();
   Serial.println("HTTP: ok");
 }
@@ -28,7 +52,7 @@ void QHTTP::loop()
   _HTTP.handleClient();
 }
 
-void QHTTP::settings()
+void QHTTP::set()
 {
   for (int i = 0; i < _HTTP.args(); i++)ConfigFile::setValue(_HTTP.argName(i), _HTTP.arg(i));
   ConfigFile::save();

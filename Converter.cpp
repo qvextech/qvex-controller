@@ -17,7 +17,7 @@ ColorMessage Converter::convert(ColorMessage msg) {
           return msg;
           break;
         default:
-          Serial.println("Converter: invalid conversion from type 1 to type " + String(STRIP_TYPE));
+          Serial.println("Converter: invalid conversion from data type 1 to strip type " + String(STRIP_TYPE));
           break;
       }
       break;
@@ -28,7 +28,7 @@ ColorMessage Converter::convert(ColorMessage msg) {
           return msg;
           break;
         default:
-          Serial.println("Converter: invalid conversion from type 2 to type " + String(STRIP_TYPE));
+          Serial.println("Converter: invalid conversion from data type 2 to strip type " + String(STRIP_TYPE));
           break;
       }
       break;
@@ -39,7 +39,7 @@ ColorMessage Converter::convert(ColorMessage msg) {
           return msg;
           break;
         case 4:
-        case 11:
+        case 14:
         {
           RGB white = {255, 170, 70};
           RGB rgb = {msg.r, msg.g, msg.b};
@@ -50,20 +50,22 @@ ColorMessage Converter::convert(ColorMessage msg) {
           break;
         }
         default:
-          Serial.println("Converter: invalid conversion from type 3 to type " + String(STRIP_TYPE));
+          Serial.println("Converter: invalid conversion from data type 3 to strip type " + String(STRIP_TYPE));
           break;
       }
+      break;
     case 4: //RGBW
       switch (STRIP_TYPE)
       {
         case 4:
-        case 11:
+        case 14:
           return msg;
           break;
         default:
-          Serial.println("Converter: invalid conversion from type 4 to type " + String(STRIP_TYPE));
+          Serial.println("Converter: invalid conversion from data type 4 to strip type " + String(STRIP_TYPE));
           break;
       }
+      break;
     case 5: //WRGBWW
       switch (STRIP_TYPE)
       {
@@ -71,7 +73,7 @@ ColorMessage Converter::convert(ColorMessage msg) {
           return msg;
           break;
         default:
-          Serial.println("Converter: invalid conversion from type 5 to type " + String(STRIP_TYPE));
+          Serial.println("Converter: invalid conversion from data type 5 to strip type " + String(STRIP_TYPE));
           break;
       }
       break;

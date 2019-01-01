@@ -37,7 +37,7 @@
 //UDP
 #define UDP_EN 1
 #define UDP_PORT 7007
-#define UDP_BUFFER_LEN 64
+#define UDP_BUFFER_LEN 1000
 //Touch
 #define TOUCH_EN ConfigFile::getValue("TOUCH_EN").toInt()
 #define TOUCH_CAL_SAMPLES 1000
@@ -47,3 +47,6 @@
 
 //OTA update
 #define OTA_GET_VERSION_URL "http://192.168.0.95/getVersion.php"
+
+//Controller default mode
+#define MODE_DEF 1

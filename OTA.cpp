@@ -10,7 +10,7 @@ TaskHandle_t OTA::_currentTask;
 
 void OTA::begin()
 {
-  xTaskCreatePinnedToCore(code_loop,"OTA",10000,NULL,18,&_currentTask,1);
+  xTaskCreatePinnedToCore(code_loop,"OTA",15000,NULL,18,&_currentTask,1);
   Serial.println("OTA:  ok");
 }
 

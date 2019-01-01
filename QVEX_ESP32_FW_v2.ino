@@ -22,10 +22,10 @@ void setup() {
   //Safety::begin(); //Stack - rtos timer overflow
   LEDoutput::setup();
 
-  if (TOUCH_EN)Touch::begin();
+  if (TOUCH_EN)Touch::begin();          //Start touch read thread
   WIFI::begin();
   WIFI::connect();
-  OTA::begin();
+  OTA::begin();                         //Start OTA thread
   QHTTP::begin();
   QSSDP::begin();
   if (TCP_EN)TCP::begin();
@@ -37,9 +37,6 @@ void setup() {
 void loop() {
   if (WIFI::check())
   {
-    QHTTP::loop();
-    if (TCP_EN)TCP::loop();
-    if (UDP_EN)UDPsocket::loop();
-    if (MQTT_EN)MQTT::loop();
+    Controller::loopNetwork();
   }
 }

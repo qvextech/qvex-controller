@@ -1,11 +1,11 @@
 #include "UDP.h"
 #include "Settings.h"
 #include "Controller.h"
+#include "LEDoutput.h"
 
 WiFiUDP UDPsocket::_server;
 String UDPsocket::_allowedIP;
 long UDPsocket::mils;
-uint8_t UDPscoket::_udpMode;
 
 void UDPsocket::begin()
 {
@@ -15,22 +15,15 @@ void UDPsocket::begin()
 }
 
 void UDPsocket::loop()
+{
   if(_server.parsePacket()) 
   if(_server.remoteIP().toString() == _allowedIP) {
     mils = micros();
-    
-    String myData = "";
+
     byte packetBuffer[UDP_BUFFER_LEN];
-    uint8_t len = _server.read(packetBuffer, UDP_BUFFER_LEN);
-    packetBuffer[len] = 0;
-    myData = "";
+    uint16_t len = _server.read(packetBuffer, UDP_BUFFER_LEN);
     
-    for (int i = 0; i < len; i++) {
-      myData += (char)packetBuffer[i]; 
-    }
-    
-    ColorMessage msg = {3,packetBuffer[0],packetBuffer[1],packetBuffer[2],0,0,0};
-    Controller::useColor(msg);
+    processPacket(packetBuffer,len);
   }
   else
   {
@@ -43,5 +36,22 @@ void UDPsocket::allow(String newIP)
 {
   _allowedIP = newIP;
   Serial.println("UDP: allowed IP set to "+_allowedIP);
+}
+
+void UDPsocket::processPacket(byte data[],uint16_t length)
+{
+  switch(Controller::getMode())
+  {
+    case 1:
+    {
+        ColorMessage msg = {3,data[0],data[1],data[2],0,0,0};
+        Controller::useColor(msg);
+        break;
+    }
+    case 2:
+        //if(length>ADDRESSABLE_LED_NUM*4)length=ADDRESSABLE_LED_NUM*4; //Issue: ADDRESSABLE_LED_NUM may return 0
+        LEDoutput::output(data,length);
+        break;
+  }
 }
 

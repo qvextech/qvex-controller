@@ -99,4 +99,22 @@ String ConfigFile::readFile()
   return "";
 }
 
+String ConfigFile::readFileAsJSON()
+{
+  String content = _content;
+  int start = 0;
+  int cursor = 0;
+  String json = "{";
 
+  while(start < content.length())
+  {
+    if(start != 0)json+=",";
+    cursor = content.indexOf("=",start);
+    json+="\""+content.substring(start,cursor)+"\""+":";
+    start = content.indexOf("\n",cursor)+1;
+    json+="\""+content.substring(cursor+1,start-2)+"\"";
+  }
+
+  json+="}";
+  return json;
+}

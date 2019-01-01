@@ -35,6 +35,9 @@ class Controller {
     static uint16_t getIntensity();
     static void previewIntensity(uint16_t);
     static void applyIntensity(uint16_t);
+    static void setMode(uint8_t);
+    static uint8_t getMode();
+    static void loopNetwork();
 
   private:
     static ColorMessage getFromMaxed(ColorMessage,uint16_t);
@@ -44,6 +47,7 @@ class Controller {
     static bool _state;
     static ColorMessage _color;
     static ColorMessage _maxed;
+    static uint8_t _currentMode;
 
 };
 

@@ -17,6 +17,7 @@ class UDPsocket{
     static long mils;
 
   private:
+    static void processPacket(byte[],uint16_t);
     static WiFiUDP _server;    
     static String _allowedIP;
 };

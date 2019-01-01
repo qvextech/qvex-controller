@@ -13,8 +13,8 @@ void QSSDP::begin()
 	SSDP.setModelURL("http://www.qvex.eu");
 	SSDP.setManufacturer("QVEX Tech");
 	SSDP.setManufacturerURL("http://www.qvex.eu");
-  SSDP.begin();
-  Serial.println("SSDP: ok");
+  	SSDP.begin();
+  	Serial.println("SSDP: ok");
 }
 
 void QSSDP::schema(WiFiClient c)

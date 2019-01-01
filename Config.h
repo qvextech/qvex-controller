@@ -19,6 +19,7 @@ class ConfigFile{
     static String getValue(String key); //Get value from file
     static bool setValue(String key, String value); //Set value to file
     static String readFile(); //Read entire file
+    static String readFileAsJSON();
 
   private:
     static String _content;

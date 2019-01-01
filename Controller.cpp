@@ -2,6 +2,10 @@
 #include "Converter.h"
 #include "LEDoutput.h"
 #include "Settings.h"
+#include "HTTP.h"
+#include "MQTT.h"
+#include "TCP.h"
+#include "UDP.h"
 #include <algorithm>
 #include <initializer_list>
 
@@ -13,8 +17,16 @@
 ColorMessage Controller::_color = {0, 255, 0, 255, 0, 0};// [unused,r,g,b,w,ww,unused]
 ColorMessage Controller::_maxed = {0, 255, 0, 255, 0, 1000};// [unused,r,g,b,w,ww,intensity]
 bool Controller::_state = false;
+uint8_t Controller::_currentMode = MODE_DEF;
 
 // >>> Public methods <<<
+void Controller::loopNetwork()
+{
+  QHTTP::loop();
+  if (TCP_EN)TCP::loop();
+  if (UDP_EN)UDPsocket::loop();
+  if (MQTT_EN)MQTT::loop();
+}
 
 void Controller::useColor(ColorMessage msg)
 {
@@ -62,6 +74,35 @@ void Controller::applyIntensity(uint16_t intensity)
   _color = getFromMaxed(_maxed);
   LEDoutput::output(_color);
   //Resume LSENS somewhere here (colision alert)
+}
+
+
+//Controller mode methods
+/*
+    1 - classic mode
+    2 - Addressable UDP mode
+        - data are forwarded directly (UDP->LEDoutput)
+        - Ignores all non-UDP color change commands
+        - Pause LSENS
+        - Redefine touch actions (or not ?)
+*/
+void Controller::setMode(uint8_t new_mode)
+{
+    switch(new_mode)
+    {
+      case 1: //Classic mode
+          _currentMode = 1;
+          break;
+      case 2: //Addressable UDP mode
+          //Pause LSENS HERE
+          _currentMode = 2;
+          break;
+    }
+}
+
+uint8_t Controller::getMode()
+{
+  return _currentMode;
 }
 
 

@@ -25,7 +25,7 @@ void LEDoutput::setup()
     ledcSetup(4, FREQUENCY, RESOLUTION);
     ledcAttachPin(4, CH5_PIN);
   }
-  else if (STRIP_TYPE == 11)
+  else if (STRIP_TYPE == 14)
   {
     _addressableStrip.Begin();
     RgbColor green(0, 255, 0);
@@ -46,18 +46,39 @@ void LEDoutput::output(ColorMessage msg)
   {
     case 0:
       break;
-    case 11:
+    case 14:
       _addr_msg = msg;
       xTaskCreatePinnedToCore(applyAddressable, "LEDout:applyAddr", 4000, &_addr_msg, 19, &_currentTask, 0);
       break;
     default:
-      Serial.println("LEDoutput: NA: type: " + String(stripType));
-      CHOUT chout = Converter::mapChannels(msg);
+      Serial.println("LEDoutput: unknown strip type: " + String(stripType));
+      /*CHOUT chout = Converter::mapChannels(msg);
       chout.t = msg.t;
-      xTaskCreatePinnedToCore(applyCHOUT, "LEDout:apply", 10000, &chout, 19, &_currentTask, 0);
+      xTaskCreatePinnedToCore(applyCHOUT, "LEDout:apply", 10000, &chout, 19, &_currentTask, 0);*/
       break;
   }
 }
+
+void LEDoutput::output(byte data[],uint16_t length)
+{
+  int stripType = STRIP_TYPE;
+  switch (stripType)
+  {
+    case 0:
+      break;
+    case 14:
+      for(int i = 0; i < length; i+=4) {
+          _addressableStrip.SetPixelColor(data[i], RgbwColor((uint8_t)data[i+1],(uint8_t)data[i+2],(uint8_t)data[i+2],0));
+      } 
+      _addressableStrip.Show();
+      break;
+    default:
+      Serial.println("LEDoutput: strip type " + String(stripType) + "not applicable");
+      break;
+  }
+}
+
+
 
 void LEDoutput::applyAddressable(void*data)
 {
