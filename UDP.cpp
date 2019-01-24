@@ -6,6 +6,7 @@
 WiFiUDP UDPsocket::_server;
 String UDPsocket::_allowedIP;
 long UDPsocket::mils;
+uint16_t UDPsocket::_maxPacketLength;
 
 void UDPsocket::begin()
 {

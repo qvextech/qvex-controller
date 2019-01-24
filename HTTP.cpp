@@ -29,9 +29,10 @@ void QHTTP::begin()
 
   //Request to start UDP channel
   _HTTP.on("/startUDP", HTTP_POST, []() {
-    if(_HTTP.arg("individual")=="1")Controller::setMode(2);
+    if(_HTTP.arg("individual")=="1" && Controller::getMode() != 2)Controller::setMode(2);
     UDPsocket::allow(_HTTP.arg("ip"));
-    _HTTP.send(200, "text/plain", "OK");
+    String pixes = ConfigFile::getValue("PIX_COUNT");
+    _HTTP.send(200, "text/plain", "{\"pixels\":"+pixes+",\"max_packet\":"+String(pixes.toInt()*4)+"}");
   });
 
   _HTTP.on("/endUDP", HTTP_POST, []() {

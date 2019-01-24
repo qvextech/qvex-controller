@@ -1,11 +1,19 @@
 #include "Config.h"
 
+//Define PCB version here <--
+//#define PCB_DEV_0_1
+//#define PCB_DEV_1_1
+#define PCB_DEV_1_2
+
+#define ADC_NO_OF_SAMPLES   100
+
+#define DEVICE_NAME ConfigFile::getValue("D_NAME")
+
 //Default transition time
 #define TRANS_T_DEF 500
 
 //Enable automatic brightness [0,1]
-#define LIGHTSENS_EN ConfigFile::getValue("LSENS_EN").toInt() 
-
+#define LSENS_EN ConfigFile::getValue("LSENS_EN").toInt() 
 /* 
  *  Define LED strip type
  *  1 - SC
@@ -25,7 +33,7 @@
 
 //PWM settings
 #define RESOLUTION 8
-#define FREQUENCY 5000
+#define FREQUENCY 12000
 
 //Enable MQTT [0,1]
 #define MQTT_EN ConfigFile::getValue("MQTT_EN").toInt()
@@ -50,3 +58,6 @@
 
 //Controller default mode
 #define MODE_DEF 1
+
+//Onboard indication addressable LEDs
+#define ONBOARD_LED_NUM 4

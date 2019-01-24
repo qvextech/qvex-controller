@@ -1,13 +1,17 @@
 #include "Light.h"
+#include "pins.h"
+#include "Settings.h"
+#include "driver/adc.h"
 
-#define BETA 0.05
-/*
-CH2B Light::_calibData = {0,0,0,0,0};
-int16_t Light::_low;
-int16_t Light::_high;
+#define BETA 0.5
+#define LIGHT_ATTEN ADC_ATTEN_DB_11
 
-void Light::calibrate(){
-  /*uint16_t outsource = calibColor(0,0,0,0,0);
+//CH2B Light::_calibData = {0,0,0,0,0};
+int16_t Light::_low = 0;
+int16_t Light::_high = 1000;
+
+/*void Light::calibrate(){
+  uint16_t outsource = calibColor(0,0,0,0,0);
   
   _calibData.a = calibColor(255,0,0,0,0);
   _calibData.b = calibColor(0,255,0,0,0);
@@ -22,14 +26,22 @@ void Light::calibrate(){
   _calibData.e = max(_calibData.e,outsource) - min(_calibData.e,outsource);
 
   CHOUT chout = {0,0,0,255,0,0};
-  //SPIIF spiif.sendCH(chout);*/
-//s}
-/*
+  SPIIF spiif.sendCH(chout);
+}*/
+
+void Light::begin()
+{
+  adc1_config_width(ADC_WIDTH_BIT_12);
+  adc1_config_channel_atten(LIGHT_PIN, LIGHT_ATTEN);
+}
+
 int16_t Light::loop()
 {
-  int16_t source = getOutsource();
-  Serial.print("Source: "+String(source)+" | ");
+  uint16_t source = getOutsource();
+  Serial.println("Light: loop: outsource: "+String(source));
   int16_t res = map(source,_low,_high,1000,0);
+  if(res < 0)res = 0; if(res > 1000)res = 1000;
+  Serial.println("Light: loop: suggestedI: "+String(res));
   return res;
 }
 
@@ -38,8 +50,6 @@ void Light::set(int16_t intensity)
   uint16_t initL = getOutsource();
   _low = initL - (1000-intensity)*BETA;
   _high = initL + intensity*BETA;
-  if(_low < 0) _low = 0;
-  if(_high > 1022) _high = 1022;
   Serial.println("Light: initL: "+String(initL)+" low: "+String(_low)+" high: "+String(_high));
 }
 
@@ -59,12 +69,12 @@ uint16_t Light::calibrateSet(byte a,byte b, byte c, byte d, byte e)
 
 uint16_t Light::getOutsource()
 {
-  byte data[1] = {'l'};
-  byte* in;
-  //SPIIF spiif.send(data,1);
-  delayMicroseconds(1000);
-  //SPIIFin = spiif.receive(2);
-  uint16_t res = (in[1] | in[0] << 8);
+  uint32_t adc_reading = 0;
+  for (int i = 0; i < 1000; i++) {
+      adc_reading += adc1_get_raw(LIGHT_PIN);
+      delayMicroseconds(2);
+  }
+  adc_reading /= 1000;
   /*Serial.print("Lsens calibration: ");Serial.print(_calibData.a,DEC);Serial.print(" ");Serial.print(_calibData.b,DEC);Serial.print(" ");Serial.print(_calibData.c,DEC);Serial.print(" ");Serial.print(_calibData.d,DEC);Serial.print(" ");Serial.print(_calibData.e,DEC);Serial.print("\n");
   Serial.print("Current LED: ");Serial.print(current.a,DEC);Serial.print(" ");Serial.print(current.b,DEC);Serial.print(" ");Serial.print(current.c,DEC);Serial.print(" ");Serial.print(current.d,DEC);Serial.print(" ");Serial.print(current.e,DEC);Serial.print("\n");
   Serial.println("Light: res1: "+String(res));
@@ -78,6 +88,6 @@ uint16_t Light::getOutsource()
   Serial.println("Light: res5: "+String(res));
   res = res - (current.e*_calibData.e/255);
   Serial.println("Light: res4: "+String(res));*/
- /* return res;
-}*/
+  return adc_reading;//res;
+}
 

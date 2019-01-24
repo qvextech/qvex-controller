@@ -20,6 +20,7 @@ class UDPsocket{
     static void processPacket(byte[],uint16_t);
     static WiFiUDP _server;    
     static String _allowedIP;
+    static uint16_t _maxPacketLength;
 };
 
 #endif

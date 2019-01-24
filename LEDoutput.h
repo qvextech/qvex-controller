@@ -21,6 +21,7 @@ class LEDoutput{
       static TaskHandle_t _currentTask;
       static NeoPixelBus<NeoGrbwFeature, Neo800KbpsMethod> _addressableStrip;
       static ColorMessage _addr_msg;
+      static CHOUT _classic_chout;
 };
 
 #endif

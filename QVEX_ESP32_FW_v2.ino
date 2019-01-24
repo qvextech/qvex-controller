@@ -12,6 +12,9 @@
 #include "HTTP.h"
 #include "SSDP.h"
 #include "OTA.h"
+#include "pins.h"
+#include "Light.h"
+#include "Indication.h"
 
 void setup() {
   Serial.begin(1000000);
@@ -19,6 +22,7 @@ void setup() {
   Serial.println("_________\n\nConfig:");
   Serial.println(ConfigFile::readFile());
 
+  Indication::begin();
   //Safety::begin(); //Stack - rtos timer overflow
   LEDoutput::setup();
 
@@ -31,12 +35,13 @@ void setup() {
   if (TCP_EN)TCP::begin();
   if (UDP_EN)UDPsocket::begin();
   if (MQTT_EN)MQTT::begin();
+  if (LSENS_EN)Light::begin();
   if (METER_EN)Consumption::begin();
 }
 
 void loop() {
   if (WIFI::check())
   {
-    Controller::loopNetwork();
+    Controller::loop();
   }
 }

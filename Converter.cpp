@@ -10,7 +10,7 @@
 ColorMessage Converter::convert(ColorMessage msg) {
   Serial.println("Converter: "+String(msg.type)+" -> "+String(STRIP_TYPE));
   switch (msg.type) {
-    case 1: //SC
+    case 1: //SC msg
       switch (STRIP_TYPE)
       {
         case 1:
@@ -21,7 +21,7 @@ ColorMessage Converter::convert(ColorMessage msg) {
           break;
       }
       break;
-    case 2: //CCT
+    case 2: //CCT msg
       switch (STRIP_TYPE)
       {
         case 2:
@@ -32,7 +32,7 @@ ColorMessage Converter::convert(ColorMessage msg) {
           break;
       }
       break;
-    case 3: //RGB
+    case 3: //RGB msg
       switch (STRIP_TYPE)
       {
         case 3:
@@ -49,12 +49,16 @@ ColorMessage Converter::convert(ColorMessage msg) {
           return msg;
           break;
         }
+        case 5:
+          msg.type = STRIP_TYPE; msg.w = 0; msg.ww = 0;
+          return msg;
+          break;
         default:
           Serial.println("Converter: invalid conversion from data type 3 to strip type " + String(STRIP_TYPE));
           break;
       }
       break;
-    case 4: //RGBW
+    case 4: //RGBW msg
       switch (STRIP_TYPE)
       {
         case 4:
@@ -66,7 +70,7 @@ ColorMessage Converter::convert(ColorMessage msg) {
           break;
       }
       break;
-    case 5: //WRGBWW
+    case 5: //WRGBWW msg
       switch (STRIP_TYPE)
       {
         case 5:
@@ -99,7 +103,7 @@ CHOUT Converter::mapChannels(ColorMessage msg)
       chout.b = msg.r; chout.c = msg.g; chout.d = msg.b; chout.e = msg.w;
       break;
     case 5:
-      chout.a = msg.r; chout.b = msg.g; chout.c = msg.b; chout.d = msg.w; chout.e = msg.ww;
+      chout.a = msg.w; chout.b = msg.ww; chout.c = msg.g; chout.d = msg.r; chout.e = msg.b;
       break;
     default:
       Serial.println("Converter: Unknown strip type: "+String(strip));

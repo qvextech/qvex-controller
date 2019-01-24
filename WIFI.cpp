@@ -31,12 +31,13 @@ void WIFI::begin()
 
 void WIFI::connect()
 {
-  Indication::blink(200);
+  Indication::breath(255,0,255,5);
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
     Serial.print(".");
   }
   Indication::stop();
+  Indication::blink(0,255,0,100,3);
   Serial.print("\nWIFI: ok: ");
   Serial.println(WiFi.localIP());
 }

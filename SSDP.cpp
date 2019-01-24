@@ -1,13 +1,14 @@
 #include "SSDP.h"
 #include <ESP32SSDP.h>
+#include "Settings.h"
 
 void QSSDP::begin()
 {
+	SSDP.setDeviceType("urn:qvex.eu:device:LedStripController:1");
 	SSDP.setSchemaURL("description.xml");
 	SSDP.setHTTPPort(80);
-	SSDP.setName("QVEX Controller");
+	SSDP.setName("QVEX Controller - "+DEVICE_NAME);
 	SSDP.setSerialNumber("001788102201");
-	SSDP.setURL("index.html");
 	SSDP.setModelName("QVEX LED strip controller 0.9");
 	SSDP.setModelNumber("929000226503");
 	SSDP.setModelURL("http://www.qvex.eu");

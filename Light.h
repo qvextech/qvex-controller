@@ -11,6 +11,7 @@
 
 class Light{
   public:
+    static void begin();
     static int16_t loop();
     static void set(int16_t);
     static uint16_t getOutsource();

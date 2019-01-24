@@ -10,7 +10,7 @@ TaskHandle_t OTA::_currentTask;
 
 void OTA::begin()
 {
-  xTaskCreatePinnedToCore(code_loop,"OTA",15000,NULL,18,&_currentTask,1);
+  xTaskCreatePinnedToCore(code_loop,"OTA",20000,NULL,20,&_currentTask,1);
   Serial.println("OTA:  ok");
 }
 
@@ -37,7 +37,8 @@ void OTA::checkUpdate()
       if(ver > curVer)
       {
         Serial.println("OTA: new FW ver on server: "+String(ver)+" (current: "+String(curVer)+")");
-        Indication::blink(10);
+        ColorMessage blink = {0,20,0,20,0,0,60};
+        //Indication::blink(blink);
         Serial.println("OTA: updating...");
         ESPhttpUpdate.rebootOnUpdate(false);
         t_httpUpdate_return ret = ESPhttpUpdate.update("http://192.168.0.95/qvex_fw/"+String(ver)+".bin");

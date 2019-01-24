@@ -9,27 +9,26 @@
 NeoPixelBus<NeoGrbwFeature, Neo800KbpsMethod> LEDoutput::_addressableStrip(ADDRESSABLE_LED_NUM_DIRECT, ADDRESSABLE_PIN);
 TaskHandle_t LEDoutput::_currentTask;
 ColorMessage LEDoutput::_addr_msg;
+CHOUT LEDoutput::_classic_chout;
 
 void LEDoutput::setup()
 {
   if (STRIP_TYPE <= 5)
   {
+    ledcAttachPin(CH1_PIN, 1);
     ledcSetup(0, FREQUENCY, RESOLUTION);
-    ledcAttachPin(CH1_PIN, 0);
+    ledcAttachPin(CH2_PIN, 2);
     ledcSetup(1, FREQUENCY, RESOLUTION);
-    ledcAttachPin(1, CH2_PIN);
+    ledcAttachPin(CH3_PIN, 3);
     ledcSetup(2, FREQUENCY, RESOLUTION);
-    ledcAttachPin(2, CH3_PIN);
+    ledcAttachPin(CH4_PIN, 4);
     ledcSetup(3, FREQUENCY, RESOLUTION);
-    ledcAttachPin(3, CH4_PIN);
+    ledcAttachPin(CH5_PIN, 5);
     ledcSetup(4, FREQUENCY, RESOLUTION);
-    ledcAttachPin(4, CH5_PIN);
   }
   else if (STRIP_TYPE == 14)
   {
     _addressableStrip.Begin();
-    RgbColor green(0, 255, 0);
-    _addressableStrip.SetPixelColor(0, green);
     _addressableStrip.Show();
   }
   else
@@ -40,21 +39,27 @@ void LEDoutput::setup()
 
 void LEDoutput::output(ColorMessage msg)
 {
-  //Serial.println("Output: outputing: " + String(msg.r) + "  " + String(msg.g) + "  " + String(msg.b) + "  " + String(msg.w));
+  Serial.println("Output: outputing: " + String(msg.r) + "  " + String(msg.g) + "  " + String(msg.b) + "  " + String(msg.w) + "  " + String(msg.ww));
   int stripType = STRIP_TYPE;
   switch (stripType)
   {
     case 0:
       break;
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+      _classic_chout = Converter::mapChannels(msg);
+      _classic_chout.t = msg.t;
+      xTaskCreatePinnedToCore(applyCHOUT, "LEDout:apply", 5000, &_classic_chout, 19, &_currentTask, 0);
+      break;
     case 14:
       _addr_msg = msg;
-      xTaskCreatePinnedToCore(applyAddressable, "LEDout:applyAddr", 4000, &_addr_msg, 19, &_currentTask, 0);
+      xTaskCreatePinnedToCore(applyAddressable, "LEDout:applyAddr", 5000, &_addr_msg, 19, &_currentTask, 0);
       break;
     default:
       Serial.println("LEDoutput: unknown strip type: " + String(stripType));
-      /*CHOUT chout = Converter::mapChannels(msg);
-      chout.t = msg.t;
-      xTaskCreatePinnedToCore(applyCHOUT, "LEDout:apply", 10000, &chout, 19, &_currentTask, 0);*/
       break;
   }
 }
@@ -115,7 +120,10 @@ void LEDoutput::applyAddressable(void*data)
 void LEDoutput::applyCHOUT(void*data)
 {
   CHOUT chout = *(CHOUT *) data;
-  ledcWrite(0, chout.b);
-  Serial.println("LEDoutput: task done: " + String(chout.b));
+  ledcWrite(1, chout.a);
+  ledcWrite(2, chout.b);
+  ledcWrite(3, chout.c);
+  ledcWrite(4, chout.d);
+  ledcWrite(5, chout.e);
   vTaskDelete(NULL);
 }
