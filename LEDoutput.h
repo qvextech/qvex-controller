@@ -18,10 +18,12 @@ class LEDoutput{
     private:
       static void applyCHOUT(void*);
       static void applyAddressable(void*);
+      static void applyCHOUToverTime(CHOUT,CHOUT);
       static TaskHandle_t _currentTask;
       static NeoPixelBus<NeoGrbwFeature, Neo800KbpsMethod> _addressableStrip;
       static ColorMessage _addr_msg;
       static CHOUT _classic_chout;
+      static CHOUT _stored_chout;
 };
 
 #endif

@@ -10,6 +10,7 @@ NeoPixelBus<NeoGrbwFeature, Neo800KbpsMethod> LEDoutput::_addressableStrip(ADDRE
 TaskHandle_t LEDoutput::_currentTask;
 ColorMessage LEDoutput::_addr_msg;
 CHOUT LEDoutput::_classic_chout;
+CHOUT LEDoutput::_stored_chout = {0,0,0,0,0,0};
 
 void LEDoutput::setup()
 {
@@ -120,10 +121,37 @@ void LEDoutput::applyAddressable(void*data)
 void LEDoutput::applyCHOUT(void*data)
 {
   CHOUT chout = *(CHOUT *) data;
+  if(chout.t != 0)
+  {
+    Serial.println("Output: time: "+String(chout.t));
+    applyCHOUToverTime(_stored_chout, chout);
+  }
   ledcWrite(1, chout.a);
   ledcWrite(2, chout.b);
   ledcWrite(3, chout.c);
   ledcWrite(4, chout.d);
   ledcWrite(5, chout.e);
+  _stored_chout = chout;
   vTaskDelete(NULL);
+}
+
+
+
+void LEDoutput::applyCHOUToverTime(CHOUT from, CHOUT to)
+{
+  float ticks = to.t/16.0;
+  float diff_a = (to.a-from.a)/ticks;
+  float diff_b = (to.b-from.b)/ticks;
+  float diff_c = (to.c-from.c)/ticks;
+  float diff_d = (to.d-from.d)/ticks;
+  float diff_e = (to.e-from.e)/ticks;
+  for (int i = 1; i <= ticks; ++i)
+  {
+    ledcWrite(1, from.a+diff_a*i);
+    ledcWrite(2, from.b+diff_b*i);
+    ledcWrite(3, from.c+diff_c*i);
+    ledcWrite(4, from.d+diff_d*i);
+    ledcWrite(5, from.e+diff_e*i);
+    delay(16);
+  }
 }

@@ -15,8 +15,8 @@
       __typeof__ (b) _b = (b); \
     _a > _b ? _a : _b; })
 */
-ColorMessage Controller::_color = {0, 255, 0, 255, 0, 0, 0};// [unused,r,g,b,w,ww,unused]
-ColorMessage Controller::_maxed = {0, 255, 0, 255, 0, 0, 0};// [unused,r,g,b,w,ww,intensity]
+ColorMessage Controller::_color = {0, 255, 0, 255, 255, 0, 0};// [unused,r,g,b,w,ww,unused]
+ColorMessage Controller::_maxed = {0, 255, 0, 255, 255, 0, 0};// [unused,r,g,b,w,ww,intensity]
 bool Controller::_state = false;
 uint8_t Controller::_currentMode = MODE_DEF;
 bool Controller::_lightEN = true;
