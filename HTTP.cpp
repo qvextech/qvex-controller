@@ -5,6 +5,7 @@
 #include "Controller.h"
 #include "UDP.h"
 #include "struct_def.h"
+#include "Consumption.h"
 
 WebServer QHTTP::_HTTP(80);
 long QHTTP::mic1 = 0;
@@ -28,6 +29,18 @@ void QHTTP::begin()
   //Get device info
   _HTTP.on("/get/settings",HTTP_GET, []() {
     _HTTP.send(200, "text/plain", ConfigFile::readFileAsJSON());
+  });
+
+  _HTTP.on("/get/power",HTTP_GET, []() {
+    _HTTP.send(200, "text/plain", String(Consumption::getPower()));
+  });
+
+  _HTTP.on("/get/voltage",HTTP_GET, []() {
+    _HTTP.send(200, "text/plain", String(Consumption::getVoltage()));
+  });
+
+  _HTTP.on("/get/current",HTTP_GET, []() {
+    _HTTP.send(200, "text/plain", String(Consumption::getCurrent()));
   });
 
   //Request to start UDP channel
