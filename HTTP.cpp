@@ -26,7 +26,7 @@ void QHTTP::begin()
   _HTTP.on("/intensity", HTTP_POST, intensity);
 
   //Get device info
-  _HTTP.on("/getSettings",HTTP_GET, []() {
+  _HTTP.on("/get/settings",HTTP_GET, []() {
     _HTTP.send(200, "text/plain", ConfigFile::readFileAsJSON());
   });
 
