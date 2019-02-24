@@ -16,14 +16,15 @@ class Indication{
     static void stop();
     static void blink(uint8_t,uint8_t,uint8_t,uint16_t,uint8_t=0);
     static void breath(uint8_t,uint8_t,uint8_t,uint16_t,uint8_t=0);
-    static void done();
+    static void setColor(uint8_t,uint8_t,uint8_t);
   private:
     static void code_blink(void*);
     static void code_breath(void*);
     static void code_done(void*);
     static TaskHandle_t _currentTask;
-    static NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> _addressableStrip;
+    static NeoPixelBus<NeoGrbFeature, NeoEsp32BitBang800KbpsMethod> _addressableStrip;
     static uint16_t _tmp_uint;
+    static bool _busy;
 };
 
 #endif

@@ -32,7 +32,6 @@ void Touch::handleTouch()
     {
       if (touchRead(TOUCH_PIN) > _ref) //Touch shorter than 400ms -> vyp/zap
       {
-        //Do something
         Controller::state();
         delay(500);
         return;
@@ -43,7 +42,6 @@ void Touch::handleTouch()
     int dir = 1;
     while (touchRead(TOUCH_PIN) < _ref) //If touch is longer than 400ms -> loop through intensity range while touch still active
     {
-      Serial.println("Touch: preview I: "+String(n));
       n += 6 * dir;
       if (n > 1000){dir = -1; n=1000;}
       if (n < 0){dir = 1; n=0;}
@@ -58,13 +56,16 @@ void Touch::calibrate()
 {
   uint8_t val = 255;
   uint8_t touch;
+  touchRead(TOUCH_PIN);
+  touchRead(TOUCH_PIN);
+  delay(2);
   for(int i = 0; i < TOUCH_CAL_SAMPLES; i++)
   {
     touch = touchRead(TOUCH_PIN);
     if(touch < val) val = touch;
     delayMicroseconds(100);
   }
-  _ref = val*0.9;
+  _ref = val*0.97;
   Serial.println("Touch: calibrate: result: "+String(_ref));
 }
 

@@ -7,14 +7,7 @@
 #include "TCP.h"
 #include "UDP.h"
 #include "Light.h"
-#include <algorithm>
-#include <initializer_list>
 
-/*#define max(a,b) \
-  ({ __typeof__ (a) _a = (a); \
-      __typeof__ (b) _b = (b); \
-    _a > _b ? _a : _b; })
-*/
 ColorMessage Controller::_color = {0, 255, 0, 255, 255, 0, 0};// [unused,r,g,b,w,ww,unused]
 ColorMessage Controller::_maxed = {0, 255, 0, 255, 255, 0, 0};// [unused,r,g,b,w,ww,intensity]
 bool Controller::_state = false;
@@ -30,21 +23,16 @@ void Controller::loop()
   if (MQTT_EN)MQTT::loop();
 
   //Auto-brightness loop
-  uint16_t l;
-  if (LSENS_EN && _state && _lightEN)l = Light::loop();
-  if (LSENS_EN && _state && _lightEN)adjustIntensity(l);
-  delay(16);
+  if (LSENS_EN && _state && _lightEN && !LEDoutput::busy)adjustIntensity(Light::loop());
+  //delay(16);
 }
 
 void Controller::useColor(ColorMessage msg)
 {
   msg = Converter::convert(msg);
   _color = msg;
-  if (TOUCH_EN || LSENS_EN)
-  {
-    _maxed = getMaxed(msg);
-    Light::set(_maxed.t);//Set LSENS new intensity HERE
-  }
+  if (TOUCH_EN || LSENS_EN)_maxed = getMaxed(msg);
+  if (LSENS_EN)Light::set(_maxed.t); //Set LSENS new intensity HERE
   Serial.println("Controller: from " + String(msg.r) + " to " + String(_maxed.r) + " with " + String(_maxed.t) + " multiplier");
   _state = true;
   LEDoutput::output(msg);
@@ -85,7 +73,7 @@ void Controller::previewIntensity(uint16_t intensity)
   LEDoutput::output(getFromMaxed(_maxed,intensity));
 }
 
-void Controller::applyIntensity(uint16_t intensity)
+void Controller::applyIntensity(uint16_t intensity) //Set new intensity
 {
   if(intensity > 4)
   {
@@ -102,7 +90,7 @@ void Controller::applyIntensity(uint16_t intensity)
   _lightEN = true; //Resume LSENS (colision alert)
 }
 
-void Controller::adjustIntensity(uint16_t intensity)
+void Controller::adjustIntensity(uint16_t intensity) //Adjust currentely set intensity
 {
   _maxed.t = intensity;
   _color = getFromMaxed(_maxed);

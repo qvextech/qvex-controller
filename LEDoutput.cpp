@@ -5,12 +5,13 @@
 #include "UDP.h"
 
 //Integer divided by zero after Output: addressable: 0  0  0  0  0  500 !!
+NeoPixelBus<NeoGrbwFeature, Neo800KbpsMethod>* LEDoutput::_addressableStrip = NULL;
 
-NeoPixelBus<NeoGrbwFeature, Neo800KbpsMethod> LEDoutput::_addressableStrip(ADDRESSABLE_LED_NUM_DIRECT, ADDRESSABLE_PIN);
 TaskHandle_t LEDoutput::_currentTask;
 ColorMessage LEDoutput::_addr_msg;
 CHOUT LEDoutput::_classic_chout;
 CHOUT LEDoutput::_stored_chout = {0,0,0,0,0,0};
+bool LEDoutput::busy = false;
 
 void LEDoutput::setup()
 {
@@ -29,8 +30,9 @@ void LEDoutput::setup()
   }
   else if (STRIP_TYPE == 14)
   {
-    _addressableStrip.Begin();
-    _addressableStrip.Show();
+    _addressableStrip = new NeoPixelBus<NeoGrbwFeature, Neo800KbpsMethod>(ADDRESSABLE_LED_NUM, ADDRESSABLE_PIN);
+    _addressableStrip->Begin();
+    _addressableStrip->Show();
   }
   else
   {
@@ -74,9 +76,9 @@ void LEDoutput::output(byte data[],uint16_t length)
       break;
     case 14:
       for(int i = 0; i < length; i+=4) {
-          _addressableStrip.SetPixelColor(data[i], RgbwColor((uint8_t)data[i+1],(uint8_t)data[i+2],(uint8_t)data[i+2],0));
+          _addressableStrip->SetPixelColor(data[i], RgbwColor((uint8_t)data[i+1],(uint8_t)data[i+2],(uint8_t)data[i+2],0));
       } 
-      _addressableStrip.Show();
+      _addressableStrip->Show();
       break;
     default:
       Serial.println("LEDoutput: strip type " + String(stripType) + "not applicable");
@@ -88,6 +90,7 @@ void LEDoutput::output(byte data[],uint16_t length)
 
 void LEDoutput::applyAddressable(void*data)
 {
+  busy = true;
   long mic1, mic2;
   ColorMessage msg = *(ColorMessage *) data;
   Serial.println("Output: addressable: " + String(msg.r) + "  " + String(msg.g) + "  " + String(msg.b) + "  " + String(msg.w) + "  " + String(msg.ww) + "  " + String(msg.t));
@@ -99,39 +102,38 @@ void LEDoutput::applyAddressable(void*data)
     case 0:
       for (int i = 0; i < pixelCount; i++)
       {
-        _addressableStrip.SetPixelColor(i, color);
+        _addressableStrip->SetPixelColor(i, color);
       }
-      _addressableStrip.Show();
+      _addressableStrip->Show();
       break;
     default:
-      int delayms = msg.t / pixelCount;
+      int delayms = msg.t / pixelCount+1;
+      delay(delayms);
       for (int i = 0; i < pixelCount; i++)
       {
-        _addressableStrip.SetPixelColor(i, color);
-        _addressableStrip.Show();
+        _addressableStrip->SetPixelColor(i, color);
+        _addressableStrip->Show();
         delay(delayms);
       }
       break;
   }
   mic2 = micros();
-  Serial.println("applyAdresasble: took: " + String(mic2 - UDPsocket::mils));
+  busy = false;
   vTaskDelete(NULL);
 }
 
 void LEDoutput::applyCHOUT(void*data)
 {
+  busy = true;
   CHOUT chout = *(CHOUT *) data;
-  if(chout.t != 0)
-  {
-    Serial.println("Output: time: "+String(chout.t));
-    applyCHOUToverTime(_stored_chout, chout);
-  }
+  if(chout.t != 0)applyCHOUToverTime(_stored_chout, chout);
   ledcWrite(1, chout.a);
   ledcWrite(2, chout.b);
   ledcWrite(3, chout.c);
   ledcWrite(4, chout.d);
   ledcWrite(5, chout.e);
   _stored_chout = chout;
+  busy = false;
   vTaskDelete(NULL);
 }
 

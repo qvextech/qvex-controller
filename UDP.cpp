@@ -5,7 +5,6 @@
 
 WiFiUDP UDPsocket::_server;
 String UDPsocket::_allowedIP;
-long UDPsocket::mils;
 uint16_t UDPsocket::_maxPacketLength;
 
 void UDPsocket::begin()
@@ -19,11 +18,8 @@ void UDPsocket::loop()
 {
   if(_server.parsePacket()) 
   if(_server.remoteIP().toString() == _allowedIP) {
-    mils = micros();
-
     byte packetBuffer[UDP_BUFFER_LEN];
     uint16_t len = _server.read(packetBuffer, UDP_BUFFER_LEN);
-    
     processPacket(packetBuffer,len);
   }
   else

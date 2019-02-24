@@ -13,15 +13,17 @@ TaskHandle_t Safety::_currentTask;
 
 void Safety::begin()
 {
-	xTaskCreatePinnedToCore(code_loop,"safety",500,NULL,18,&_currentTask,0);
+	xTaskCreatePinnedToCore(code_loop,"safety",1000,NULL,18,&_currentTask,0);
 }
 
 void Safety::code_loop(void*) 
 {
+	int tmp;
 	while(true)
 	{
-		if((temprature_sens_read() - 32 ) / 1.8 > 90)Serial.println("Temperature WARNING !");
-  	delay(5000);
+		tmp = (temprature_sens_read() - 32 ) / 1.8;
+		if(tmp >= 40)Serial.println("Temperature WARNING!: "+String(tmp));
+  		delay(15000);
 	}
 	vTaskDelete(NULL);
 }

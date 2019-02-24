@@ -7,8 +7,9 @@
 #define LIGHT_ATTEN ADC_ATTEN_DB_11
 
 //CH2B Light::_calibData = {0,0,0,0,0};
-int16_t Light::_low = 0;
-int16_t Light::_high = 1000;
+int32_t Light::_low = 0;
+int32_t Light::_high = 65535;
+VEML7700 Light::_als;
 
 /*void Light::calibrate(){
   uint16_t outsource = calibColor(0,0,0,0,0);
@@ -31,8 +32,11 @@ int16_t Light::_high = 1000;
 
 void Light::begin()
 {
-  adc1_config_width(ADC_WIDTH_BIT_12);
-  adc1_config_channel_atten(LIGHT_PIN, LIGHT_ATTEN);
+  _als.begin();
+  _als.setGain(VEML7700::ALS_GAIN_d8);
+  //adc1_config_width(ADC_WIDTH_BIT_12);
+  //adc1_config_channel_atten(LIGHT_PIN, LIGHT_ATTEN);
+  Serial.println("Light: ok");
 }
 
 int16_t Light::loop()
@@ -69,12 +73,14 @@ uint16_t Light::calibrateSet(byte a,byte b, byte c, byte d, byte e)
 
 uint16_t Light::getOutsource()
 {
-  uint32_t adc_reading = 0;
-  for (int i = 0; i < 1000; i++) {
+  uint16_t raw;
+  _als.getALS(raw);
+  /*uint32_t adc_reading = 0;
+  for (int i = 0; i < 100; i++) {
       adc_reading += adc1_get_raw(LIGHT_PIN);
       delayMicroseconds(2);
   }
-  adc_reading /= 1000;
+  adc_reading /= 100;*/
   /*Serial.print("Lsens calibration: ");Serial.print(_calibData.a,DEC);Serial.print(" ");Serial.print(_calibData.b,DEC);Serial.print(" ");Serial.print(_calibData.c,DEC);Serial.print(" ");Serial.print(_calibData.d,DEC);Serial.print(" ");Serial.print(_calibData.e,DEC);Serial.print("\n");
   Serial.print("Current LED: ");Serial.print(current.a,DEC);Serial.print(" ");Serial.print(current.b,DEC);Serial.print(" ");Serial.print(current.c,DEC);Serial.print(" ");Serial.print(current.d,DEC);Serial.print(" ");Serial.print(current.e,DEC);Serial.print("\n");
   Serial.println("Light: res1: "+String(res));
@@ -88,6 +94,5 @@ uint16_t Light::getOutsource()
   Serial.println("Light: res5: "+String(res));
   res = res - (current.e*_calibData.e/255);
   Serial.println("Light: res4: "+String(res));*/
-  return adc_reading;//res;
+  return raw;
 }
-

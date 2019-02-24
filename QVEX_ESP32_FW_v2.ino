@@ -1,12 +1,11 @@
 #include "WIFI.h"
 #include "MQTT.h"
-#include "struct_def.h"
 #include "Controller.h"
 #include "Touch.h"
 #include "LEDoutput.h"
 #include "Settings.h"
-#include "TCP.h"
 #include "UDP.h"
+#include "TCP.h"
 #include "Consumption.h"
 #include "Safety.h"
 #include "HTTP.h"
@@ -23,7 +22,7 @@ void setup() {
   Serial.println(ConfigFile::readFile());
 
   Indication::begin();
-  //Safety::begin(); //Stack - rtos timer overflow
+  Safety::begin(); //Stack - rtos timer overflow
   LEDoutput::setup();
 
   if (TOUCH_EN)Touch::begin();          //Start touch read thread

@@ -14,7 +14,6 @@ class UDPsocket{
     static void begin();
     static void loop();
     static void allow(String);
-    static long mils;
 
   private:
     static void processPacket(byte[],uint16_t);

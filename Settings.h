@@ -13,7 +13,7 @@
 #define TRANS_T_DEF 500
 
 //Enable automatic brightness [0,1]
-#define LSENS_EN ConfigFile::getValue("LSENS_EN").toInt() 
+#define LSENS_EN ConfigFile::getValue("LSENS_EN").toInt()
 /* 
  *  Define LED strip type
  *  1 - SC
@@ -22,8 +22,8 @@
  *  4 - RGBW
  *  5 - WRGBWW
  *  
- *  10 - NEOPIXEL RGB
- *  11 - NEOPIXEL RGBW
+ *  13 - NEOPIXEL RGB
+ *  14 - NEOPIXEL RGBW
  */
 #define STRIP_TYPE ConfigFile::getValue("STRIP_TYPE").toInt()
 
@@ -32,7 +32,7 @@
 #define ADDRESSABLE_LED_NUM_DIRECT 30
 
 //PWM settings
-#define RESOLUTION 8
+#define RESOLUTION 9
 #define FREQUENCY 12000
 
 //Enable MQTT [0,1]
@@ -48,7 +48,7 @@
 #define UDP_BUFFER_LEN 1000
 //Touch
 #define TOUCH_EN ConfigFile::getValue("TOUCH_EN").toInt()
-#define TOUCH_CAL_SAMPLES 1000
+#define TOUCH_CAL_SAMPLES 20
 
 //Consumption meter
 #define METER_EN ConfigFile::getValue("METER_EN").toInt()
