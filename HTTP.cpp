@@ -22,6 +22,9 @@ void QHTTP::begin()
   //Change color
   _HTTP.on("/color", HTTP_POST, colorReceived);
 
+  //Change intensity
+  _HTTP.on("/intensity", HTTP_POST, intensity);
+
   //Get device info
   _HTTP.on("/getSettings",HTTP_GET, []() {
     _HTTP.send(200, "text/plain", ConfigFile::readFileAsJSON());
@@ -69,3 +72,8 @@ void QHTTP::colorReceived()
   _HTTP.send(200, "text/plain", "OK");
 }
 
+void QHTTP::intensity()
+{
+  Controller::applyIntensity(_HTTP.arg("value").toInt());
+  _HTTP.send(200, "text/plain", "OK");
+}

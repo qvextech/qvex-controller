@@ -17,6 +17,7 @@ class QHTTP{
 	private:
     static void set();
     static void colorReceived();
+    static void intensity();
 		static WebServer _HTTP;
 };
 
