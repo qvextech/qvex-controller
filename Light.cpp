@@ -71,6 +71,13 @@ uint16_t Light::calibrateSet(byte a,byte b, byte c, byte d, byte e)
   return (in[1] | in[0] << 8);
 }
 
+uint32_t Light::getOutsourceLux()
+{
+  float lux;
+  _als.scaleLux(getOutsource(), lux);
+  return uint32_t(lux*1000);
+}
+
 uint16_t Light::getOutsource()
 {
   uint16_t raw;

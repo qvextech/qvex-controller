@@ -16,7 +16,8 @@ class Light{
     static void begin();
     static int16_t loop();
     static void set(int16_t);
-    static uint16_t getOutsource();
+    static uint16_t getOutsource(); //Returns raw uint16_t full range
+    static uint32_t getOutsourceLux(); //Returns mililux
     static void adjust(CHOUT);
     static void calibrate();
   private:

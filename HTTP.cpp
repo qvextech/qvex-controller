@@ -6,6 +6,7 @@
 #include "UDP.h"
 #include "struct_def.h"
 #include "Consumption.h"
+#include "Light.h"
 
 WebServer QHTTP::_HTTP(80);
 long QHTTP::mic1 = 0;
@@ -41,6 +42,10 @@ void QHTTP::begin()
 
   _HTTP.on("/get/current",HTTP_GET, []() {
     _HTTP.send(200, "text/plain", String(Consumption::getCurrent()));
+  });
+
+  _HTTP.on("/get/light",HTTP_GET, []() {
+    _HTTP.send(200, "text/plain", String(Light::getOutsourceLux()));
   });
 
   //Request to start UDP channel
