@@ -62,3 +62,8 @@ void WIFI::startESPTouch()
   }
   Serial.print("\n");
 }
+
+void WIFI::restore()
+{
+  esp_wifi_restore();
+}

@@ -14,6 +14,7 @@ class WIFI{
     static void connect();
     static bool check();
     static void begin();
+    static void restore();
   private:
     static WiFiServer _server;
     static void startESPTouch();

@@ -2,6 +2,8 @@
 #include "Controller.h"
 #include "pins.h"
 #include "Settings.h"
+#include "WIFI.h"
+#include "Indication.h"
 
 uint8_t Touch::_ref;
 
@@ -16,6 +18,19 @@ void Touch::loop(void*data)
   while (1)
   {
     if (touchRead(TOUCH_PIN) < _ref) handleTouch();
+    if (digitalRead(0) == LOW)
+    {
+      long time = millis();
+      while(digitalRead(0) == LOW)
+      {
+        if(time < millis()-3000)
+        {
+          WIFI::restore();
+          ESP.restart();
+        }
+        delay(200);
+      }
+    }
     delay(30);
   }
   vTaskDelete(NULL);
