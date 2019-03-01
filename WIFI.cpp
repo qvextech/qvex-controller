@@ -8,6 +8,9 @@ void WIFI::begin()
 {
   WiFi.mode(WIFI_STA);
   wifi_config_t conf;
+  int8_t power;
+  esp_wifi_get_max_tx_power(&power);
+  Serial.println("WIFI: Power: "+String(power));
   esp_wifi_get_config(WIFI_IF_STA, &conf);
   const char* ssid = reinterpret_cast<const char*>(conf.sta.ssid);
   if (strlen(ssid) == 0)
