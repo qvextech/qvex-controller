@@ -23,7 +23,7 @@ void setup() {
 
   Indication::begin();
   Safety::begin(); //Stack - rtos timer overflow
-  LEDoutput::setup();
+  LEDoutput::begin();
 
   if (TOUCH_EN)Touch::begin();          //Start touch read thread
   if (LSENS_EN)Light::begin();

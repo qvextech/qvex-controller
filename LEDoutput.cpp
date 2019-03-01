@@ -13,7 +13,7 @@ CHOUT LEDoutput::_classic_chout;
 CHOUT LEDoutput::_stored_chout = {0,0,0,0,0,0};
 bool LEDoutput::busy = false;
 
-void LEDoutput::setup()
+void LEDoutput::begin()
 {
   if (STRIP_TYPE <= 5)
   {

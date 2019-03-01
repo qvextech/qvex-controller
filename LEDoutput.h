@@ -14,7 +14,7 @@ class LEDoutput{
     public:
       static void output(ColorMessage);
       static void output(byte[],uint16_t);
-      static void setup();
+      static void begin();
       static bool busy;
     private:
       static void applyCHOUT(void*);

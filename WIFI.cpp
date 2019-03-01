@@ -15,14 +15,7 @@ void WIFI::begin()
   const char* ssid = reinterpret_cast<const char*>(conf.sta.ssid);
   if (strlen(ssid) == 0)
   {
-    Serial.println("WIFI: Starting ESP-TOUCH");
-    WiFi.mode(WIFI_AP_STA);
-    WiFi.beginSmartConfig();
-    while (!WiFi.smartConfigDone()) {
-      delay(1000);
-      Serial.print("_");
-    }
-    Serial.print("\n");
+    startESPTouch();
   }
   else
   {
@@ -56,4 +49,16 @@ bool WIFI::check()
     return false;
   }
   return true;
+}
+
+void WIFI::startESPTouch()
+{
+  Serial.println("WIFI: Starting ESP-TOUCH");
+  WiFi.mode(WIFI_AP_STA);
+  WiFi.beginSmartConfig();
+  while (!WiFi.smartConfigDone()) {
+    delay(1000);
+    Serial.print("_");
+  }
+  Serial.print("\n");
 }

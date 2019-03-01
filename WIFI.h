@@ -16,6 +16,7 @@ class WIFI{
     static void begin();
   private:
     static WiFiServer _server;
+    static void startESPTouch();
 };
 
 #endif
