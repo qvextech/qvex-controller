@@ -1,5 +1,5 @@
 #include "Safety.h"
-#include "Setting.h"
+#include "Settings.h"
 
 #ifdef __cplusplus
 extern "C" {
