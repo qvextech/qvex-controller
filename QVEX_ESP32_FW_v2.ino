@@ -26,6 +26,8 @@ void setup() {
   LEDoutput::setup();
 
   if (TOUCH_EN)Touch::begin();          //Start touch read thread
+  if (LSENS_EN)Light::begin();
+  if (METER_EN)Consumption::begin();
   WIFI::begin();
   WIFI::connect();
   OTA::begin();                         //Start OTA thread
@@ -34,8 +36,6 @@ void setup() {
   if (TCP_EN)TCP::begin();
   if (UDP_EN)UDPsocket::begin();
   if (MQTT_EN)MQTT::begin();
-  if (LSENS_EN)Light::begin();
-  if (METER_EN)Consumption::begin();
 }
 
 void loop() {

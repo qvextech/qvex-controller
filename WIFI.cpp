@@ -26,7 +26,7 @@ void WIFI::begin()
   }
   else
   {
-    Serial.print("WIFI: SSID: "+String(ssid)+" ");
+    Serial.println("WIFI: SSID: "+String(ssid));
     WiFi.begin();
   }
   WiFi.setSleep(false);
@@ -35,13 +35,17 @@ void WIFI::begin()
 void WIFI::connect()
 {
   Indication::breath(255,0,255,5);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.print(".");
+  Serial.println("WIFI: Connecting...");
+  uint8_t wifiRes = WiFi.waitForConnectResult();
+  if (wifiRes != WL_CONNECTED) {
+      Serial.println("WIFI: Failed: "+String(wifiRes));
+      while(1) {
+          delay(1000);
+      }
   }
   Indication::stop();
   Indication::blink(0,255,0,100,3);
-  Serial.print("\nWIFI: ok: ");
+  Serial.print("WIFI: ok: ");
   Serial.println(WiFi.localIP());
 }
 
