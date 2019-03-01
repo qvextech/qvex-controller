@@ -1,4 +1,5 @@
 #include "Safety.h"
+#include "Setting.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,7 +23,7 @@ void Safety::code_loop(void*)
 	while(true)
 	{
 		tmp = (temprature_sens_read() - 32 ) / 1.8;
-		if(tmp >= 40)Serial.println("Temperature WARNING!: "+String(tmp));
+		if(tmp >= INNER_TEMP_THRESHOLD)Serial.println("Temperature WARNING!: "+String(tmp));
   		delay(15000);
 	}
 	vTaskDelete(NULL);

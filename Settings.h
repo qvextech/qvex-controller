@@ -61,3 +61,6 @@
 
 //Onboard indication addressable LEDs
 #define ONBOARD_LED_NUM 4
+
+//Safety settings
+#define INNER_TEMP_THRESHOLD 60
