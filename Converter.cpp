@@ -103,7 +103,7 @@ CHOUT Converter::mapChannels(ColorMessage msg)
       chout.b = msg.r; chout.c = msg.g; chout.d = msg.b; chout.e = msg.w;
       break;
     case 5:
-      chout.a = msg.w; chout.b = msg.ww; chout.c = msg.g; chout.d = msg.r; chout.e = msg.b;
+      chout.a = msg.r; chout.b = msg.g; chout.c = msg.b; chout.d = msg.w; chout.e = msg.ww;
       break;
     default:
       Serial.println("Converter: Unknown strip type: "+String(strip));
