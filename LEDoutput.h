@@ -21,7 +21,7 @@ class LEDoutput{
       static void applyAddressable(void*);
       static void applyCHOUToverTime(CHOUT,CHOUT);
       static TaskHandle_t _currentTask;
-      static NeoPixelBus<NeoGrbwFeature, Neo800KbpsMethod>* _addressableStrip;
+      static NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod>* _addressableStrip;
       static ColorMessage _addr_msg;
       static CHOUT _classic_chout;
       static CHOUT _stored_chout;

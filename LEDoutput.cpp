@@ -5,7 +5,7 @@
 #include "UDP.h"
 
 //Integer divided by zero after Output: addressable: 0  0  0  0  0  500 !!
-NeoPixelBus<NeoGrbwFeature, Neo800KbpsMethod>* LEDoutput::_addressableStrip = NULL;
+NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod>* LEDoutput::_addressableStrip = NULL;
 
 TaskHandle_t LEDoutput::_currentTask;
 ColorMessage LEDoutput::_addr_msg;
@@ -30,7 +30,7 @@ void LEDoutput::begin()
   }
   else if (STRIP_TYPE == 14)
   {
-    _addressableStrip = new NeoPixelBus<NeoGrbwFeature, Neo800KbpsMethod>(ADDRESSABLE_LED_NUM, ADDRESSABLE_PIN);
+    _addressableStrip = new NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod>(ADDRESSABLE_LED_NUM, ADDRESSABLE_PIN);
     _addressableStrip->Begin();
     _addressableStrip->Show();
   }
@@ -76,7 +76,7 @@ void LEDoutput::output(byte data[],uint16_t length)
       break;
     case 14:
       for(int i = 0; i < length; i+=4) {
-          _addressableStrip->SetPixelColor(data[i], RgbwColor((uint8_t)data[i+1],(uint8_t)data[i+2],(uint8_t)data[i+2],0));
+          _addressableStrip->SetPixelColor(data[i], RgbColor((uint8_t)data[i+1],(uint8_t)data[i+2],(uint8_t)data[i+2]));
       } 
       _addressableStrip->Show();
       break;
@@ -94,7 +94,7 @@ void LEDoutput::applyAddressable(void*data)
   long mic1, mic2;
   ColorMessage msg = *(ColorMessage *) data;
   Serial.println("Output: addressable: " + String(msg.r) + "  " + String(msg.g) + "  " + String(msg.b) + "  " + String(msg.w) + "  " + String(msg.ww) + "  " + String(msg.t));
-  RgbwColor color(msg.r, msg.g, msg.b, msg.w);
+  RgbColor color(msg.r, msg.g, msg.b);
   int pixelCount = ADDRESSABLE_LED_NUM;
   mic1 = micros();
   switch (msg.t)
