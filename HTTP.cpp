@@ -7,6 +7,7 @@
 #include "struct_def.h"
 #include "Consumption.h"
 #include "Light.h"
+#include "WiFi.h"
 
 WebServer QHTTP::_HTTP(80);
 long QHTTP::mic1 = 0;
@@ -27,9 +28,16 @@ void QHTTP::begin()
   //Change intensity
   _HTTP.on("/intensity", HTTP_POST, intensity);
 
-  //Get device info
+  //Get device settings
   _HTTP.on("/get/settings",HTTP_GET, []() {
     _HTTP.send(200, "text/plain", ConfigFile::readFileAsJSON());
+  });
+
+  //Get device info
+  _HTTP.on("/get/mac",HTTP_GET, []() {
+    String mac = WiFi.macAddress();
+    mac.replace(":","");
+    _HTTP.send(200, "text/plain", mac);
   });
 
   _HTTP.on("/get/power",HTTP_GET, []() {
