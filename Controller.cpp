@@ -24,7 +24,8 @@ void Controller::loop()
 
   //Auto-brightness loop
   if (LSENS_EN && _state && _lightEN && !LEDoutput::busy)adjustIntensity(Light::loop());
-  //delay(16);
+  
+  delay(32);
 }
 
 void Controller::useColor(ColorMessage msg)

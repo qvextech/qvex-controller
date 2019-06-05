@@ -16,6 +16,8 @@ class LEDoutput{
       static void output(byte[],uint16_t);
       static void begin();
       static bool busy;
+      static void applyCHOUT(CHOUT);
+      static CHOUT getCurrentCHOUT();
     private:
       static void applyCHOUT(void*);
       static void applyAddressable(void*);
