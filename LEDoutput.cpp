@@ -126,6 +126,13 @@ void LEDoutput::applyCHOUT(void*data)
 {
   busy = true;
   CHOUT chout = *(CHOUT *) data;
+  applyCHOUT(chout);
+  vTaskDelete(NULL);
+}
+
+void LEDoutput::applyCHOUT(CHOUT chout)
+{
+  busy = true;
   if(chout.t != 0)applyCHOUToverTime(_stored_chout, chout);
   ledcWrite(1, chout.a);
   ledcWrite(2, chout.b);
@@ -134,7 +141,6 @@ void LEDoutput::applyCHOUT(void*data)
   ledcWrite(5, chout.e);
   _stored_chout = chout;
   busy = false;
-  vTaskDelete(NULL);
 }
 
 
@@ -156,4 +162,9 @@ void LEDoutput::applyCHOUToverTime(CHOUT from, CHOUT to)
     ledcWrite(5, from.e+diff_e*i);
     delay(16);
   }
+}
+
+CHOUT LEDoutput::getCurrentCHOUT()
+{
+  return _stored_chout;
 }

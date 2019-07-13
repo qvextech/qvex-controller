@@ -17,9 +17,11 @@
 
 void setup() {
   Serial.begin(1000000);
-  ConfigFile::init("/main.cfg");
-  Serial.println("_________\n\nConfig:");
-  Serial.println(ConfigFile::readFile());
+  Config::init();
+  Serial.println("_________\n\nConfig:\n"+Config::readFile(CONFIG_PATH)+"\n____________");
+  Serial.println(Config::touch_enable);
+  Serial.println(Config::strip_type);
+  Serial.println(Config::mqtt_url);
 
   Indication::begin();
   Safety::begin(); //Stack - rtos timer overflow

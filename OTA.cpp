@@ -32,7 +32,7 @@ void OTA::checkUpdate()
   int httpCode = http.GET();
   if(httpCode == HTTP_CODE_OK) {
       uint16_t ver = http.getString().toInt();
-      uint16_t curVer = ConfigFile::getValue("FW_VER").toInt();
+      uint16_t curVer = Config::fw_version;
       if(curVer == 0) curVer = 60000;
       if(ver > curVer)
       {
@@ -54,8 +54,8 @@ void OTA::checkUpdate()
 
             case HTTP_UPDATE_OK:
                 Serial.println("OTA: HTTP_UPDATE_OK");
-                ConfigFile::setValue("FW_VER",String(ver));
-                ConfigFile::save();
+                Config::fw_version=ver;
+                Config::save();
                 ESP.restart();
                 break;
         }

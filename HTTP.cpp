@@ -7,6 +7,7 @@
 #include "struct_def.h"
 #include "Consumption.h"
 #include "Light.h"
+#include "WiFi.h"
 
 WebServer QHTTP::_HTTP(80);
 long QHTTP::mic1 = 0;
@@ -19,7 +20,7 @@ void QHTTP::begin()
   });
 
   //Apply to device's settings
-  _HTTP.on("/set", HTTP_POST, set);
+  _HTTP.on("/config", HTTP_POST, writeConfig);
 
   //Change color
   _HTTP.on("/color", HTTP_POST, colorReceived);
@@ -27,9 +28,16 @@ void QHTTP::begin()
   //Change intensity
   _HTTP.on("/intensity", HTTP_POST, intensity);
 
+  //Get device settings
+  _HTTP.on("/config",HTTP_GET, []() {
+    _HTTP.send(200, "text/plain", Config::readFileAsJSON(CONFIG_PATH));
+  });
+
   //Get device info
-  _HTTP.on("/get/settings",HTTP_GET, []() {
-    _HTTP.send(200, "text/plain", ConfigFile::readFileAsJSON());
+  _HTTP.on("/get/mac",HTTP_GET, []() {
+    String mac = WiFi.macAddress();
+    mac.replace(":","");
+    _HTTP.send(200, "text/plain", mac);
   });
 
   _HTTP.on("/get/power",HTTP_GET, []() {
@@ -52,8 +60,7 @@ void QHTTP::begin()
   _HTTP.on("/startUDP", HTTP_POST, []() {
     if(_HTTP.arg("individual")=="1" && Controller::getMode() != 2)Controller::setMode(2);
     UDPsocket::allow(_HTTP.arg("ip"));
-    String pixes = ConfigFile::getValue("PIX_COUNT");
-    _HTTP.send(200, "text/plain", "{\"pixels\":"+pixes+",\"max_packet\":"+String(pixes.toInt()*4)+"}");
+    _HTTP.send(200, "text/plain", "{\"pixels\":"+String(Config::pixel_count)+",\"max_packet\":"+String(Config::pixel_count*4)+"}");
   });
 
   _HTTP.on("/endUDP", HTTP_POST, []() {
@@ -61,9 +68,6 @@ void QHTTP::begin()
     UDPsocket::allow("");
     _HTTP.send(200, "text/plain", "OK");
   });
-
-
-
 
   _HTTP.begin();
   Serial.println("HTTP: ok");
@@ -74,10 +78,19 @@ void QHTTP::loop()
   _HTTP.handleClient();
 }
 
-void QHTTP::set()
+void QHTTP::writeConfig()
 {
-  for (int i = 0; i < _HTTP.args(); i++)ConfigFile::setValue(_HTTP.argName(i), _HTTP.arg(i));
-  ConfigFile::save();
+  if(_HTTP.hasArg("lsens_enable"))Config::device_name=_HTTP.arg("lsens_enable").toInt();
+  if(_HTTP.hasArg("power_enable"))Config::power_enable=_HTTP.arg("power_enable").toInt();
+  if(_HTTP.hasArg("touch_enable"))Config::touch_enable=_HTTP.arg("touch_enable").toInt();
+  if(_HTTP.hasArg("mqtt_enable"))Config::mqtt_enable=_HTTP.arg("mqtt_enable").toInt();
+  if(_HTTP.hasArg("pixel_count"))Config::pixel_count=_HTTP.arg("pixel_count").toInt();
+  if(_HTTP.hasArg("strip_type"))Config::strip_type=_HTTP.arg("strip_type").toInt();
+  if(_HTTP.hasArg("switch_time"))Config::switch_time=_HTTP.arg("switch_time").toInt();
+  if(_HTTP.hasArg("device_name"))Config::device_name=_HTTP.arg("device_name");
+  if(_HTTP.hasArg("lsens_beta"))Config::lsens_beta=_HTTP.arg("lsens_beta").toInt();
+
+  Config::save();
   _HTTP.send(200, "text/plain", "OK");
   delay(50);
   ESP.restart();

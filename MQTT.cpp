@@ -16,13 +16,13 @@ void MQTT::begin()
 {
   _mac = WiFi.macAddress();
   _mac.replace(":","");
-  _topic = ConfigFile::getValue("mqtt_u")+"/"+ConfigFile::getValue("sku")+"/"+_mac;  
-  client.setServer("192.168.0.95", 1883);
+  _topic = Config::mqtt_user+"/"+Config::sku+"/"+_mac;  
+  client.setServer(Config::mqtt_url.c_str(), 1883);
   client.setCallback(MQTT::callback);
 }
 
 void MQTT::reconnect() {
-  if (client.connect(_mac.c_str(), ConfigFile::getValue("mqtt_u").c_str(), ConfigFile::getValue("mqtt_p").c_str())){
+  if (client.connect(_mac.c_str(), Config::mqtt_user.c_str(), Config::mqtt_password.c_str())){
     Serial.println("MQTT: ok: "+_topic);
     client.subscribe(_topic.c_str());
   } else {

@@ -24,8 +24,8 @@ class Light{
     static VEML7700 _als;
     static int32_t _low;
     static int32_t _high;
-    //static CH2B _calibData;
-    static uint16_t calibrateSet(byte,byte,byte,byte,byte);
+    static CH2B _calibData;
+    static uint16_t calibColor(CHOUT);
 };
 
 #endif

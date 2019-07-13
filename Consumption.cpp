@@ -41,7 +41,7 @@ void Consumption::loop(void*)
     uint32_t current = adc_current_calced/0.02/33;
     float power = vin/1000.0*current;
     Serial.printf("Raw34: %d     Raw36: %d     V34: %dmV     V36: %dmV     Vin: %dmV     I: %dmA     P: %.2fmW\n", adc_vin, adc_current, adc_vin_calced, adc_current_calced, vin, current, power);*/
-    Serial.printf("V: %dmV     I: %dmA     P: %dmW\n",getVoltage(),getCurrent(),getPower());
+    //Serial.printf("V: %dmV     I: %dmA     P: %dmW\n",getVoltage(),getCurrent(),getPower());
     delay(5000);
   }
   vTaskDelete(NULL);  

@@ -19,4 +19,8 @@ struct CHOUT {
   uint16_t t;
 };
 
+struct CH2B {
+	uint16_t a,b,c,d,e;
+};
+
 #endif
