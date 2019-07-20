@@ -5,7 +5,6 @@
 #include "LEDoutput.h"
 #include "Settings.h"
 #include "UDP.h"
-#include "TCP.h"
 #include "Consumption.h"
 #include "Safety.h"
 #include "HTTP.h"
@@ -19,9 +18,6 @@ void setup() {
   Serial.begin(1000000);
   Config::init();
   Serial.println("_________\n\nConfig:\n"+Config::readFile(CONFIG_PATH)+"\n____________");
-  Serial.println(Config::touch_enable);
-  Serial.println(Config::strip_type);
-  Serial.println(Config::mqtt_url);
 
   Indication::begin();
   Safety::begin(); //Stack - rtos timer overflow
@@ -35,7 +31,6 @@ void setup() {
   OTA::begin();                         //Start OTA thread
   QHTTP::begin();
   QSSDP::begin();
-  if (TCP_EN)TCP::begin();
   if (UDP_EN)UDPsocket::begin();
   if (MQTT_EN)MQTT::begin();
 }
@@ -43,6 +38,8 @@ void setup() {
 void loop() {
   if (WIFI::check())
   {
-    Controller::loop();
+    QHTTP::loop();
+    if (UDP_EN)UDPsocket::loop();
+    if (MQTT_EN)MQTT::loop();
   }
 }

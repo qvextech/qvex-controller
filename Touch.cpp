@@ -48,7 +48,7 @@ void Touch::handleTouch()
       if (touchRead(TOUCH_PIN) > _ref) //Touch shorter than 400ms -> vyp/zap
       {
         Controller::state();
-        delay(500);
+        delay(TRANS_T_DEF+50);
         return;
       }
       delay(50);

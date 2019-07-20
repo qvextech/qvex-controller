@@ -2,6 +2,7 @@
 #include "pins.h"
 #include "Settings.h"
 #include "driver/adc.h"
+#include "Controller.h"
 #include "LEDoutput.h"
 
 #define BETA 0.5
@@ -10,6 +11,8 @@ CH2B Light::_calibData = {0,0,0,0,0};
 int32_t Light::_low = 0;
 int32_t Light::_high = 65535;
 VEML7700 Light::_als;
+TaskHandle_t Light::_currentTask;
+bool Light::pause = true;
 
 void Light::calibrate(){
   CHOUT chout;
@@ -66,13 +69,23 @@ void Light::begin()
   _als.setPowerSaving(VEML7700::ALS_POWER_MODE_1);
 
   calibrate();
+  xTaskCreatePinnedToCore(code_loop,"Light",2000,NULL,17,&_currentTask,1);
   Serial.println("Light: ok");
 }
 
-int16_t Light::loop()
+void Light::code_loop(void*)
 {
-  uint16_t source = getOutsource();
-  Serial.println("Light: loop: outsource: "+String(source));
+  while(1)
+  {
+    if(!pause)Controller::adjustIntensity(getIfromValue(getAvgOutsource()));
+    delay(2000);
+  }
+  vTaskDelete(NULL);
+}
+
+int16_t Light::getIfromValue(uint16_t source)
+{
+  Serial.println("Light: getIfromValue: value: "+String(source));
   int16_t res = map(source,_low,_high,1000,0);
   if(res < 0)res = 0; if(res > 1000)res = 1000;
   Serial.println("Light: loop: suggestedI: "+String(res));
@@ -87,6 +100,18 @@ void Light::set(int16_t intensity)
   Serial.println("Light: initL: "+String(initL)+" low: "+String(_low)+" high: "+String(_high));
 }
 
+uint16_t Light::getAvgOutsource()
+{
+  uint32_t avg = 0;
+  for(int i = 0;i<50;i++)
+  {
+    avg += getOutsource();
+    delay(26);
+  }
+  avg /= 50;
+  return (uint16_t)avg;
+}
+
 uint32_t Light::getOutsourceLux()
 {
   float lux;
@@ -98,13 +123,11 @@ uint16_t Light::getOutsource()
 {
   int32_t raw;
   uint16_t als;
-  Serial.println(millis());
   _als.getALS(als);
-  Serial.println(millis());
   raw = als;
   CHOUT current = LEDoutput::getCurrentCHOUT();
 
-  Serial.println("Light: raw-wl: "+String(raw));
+  //Serial.println("Light: raw-wl: "+String(raw));
 
   raw = raw - (current.a*_calibData.a/255);
   raw = raw - (current.b*_calibData.b/255);
@@ -112,7 +135,7 @@ uint16_t Light::getOutsource()
   raw = raw - (current.d*_calibData.d/255);
   raw = raw - (current.e*_calibData.e/255);
 
-  Serial.println("Light: raw-wol: "+String(raw));
+  //Serial.println("Light: raw-wol: "+String(raw));
   if(raw < 0) raw = 0;
   return (uint16_t)raw;
 }

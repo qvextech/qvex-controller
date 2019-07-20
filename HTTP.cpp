@@ -40,13 +40,6 @@ void QHTTP::begin()
     _HTTP.send(200, "text/plain", mac);
   });
 
-  //Get device info
-  _HTTP.on("/get/mac",HTTP_GET, []() {
-    String mac = WiFi.macAddress();
-    mac.replace(":","");
-    _HTTP.send(200, "text/plain", mac);
-  });
-
   _HTTP.on("/get/power",HTTP_GET, []() {
     _HTTP.send(200, "text/plain", String(Consumption::getPower()));
   });

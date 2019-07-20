@@ -19,14 +19,13 @@ void Consumption::begin()
   adc_chars_current = (esp_adc_cal_characteristics_t *)calloc(1, sizeof(esp_adc_cal_characteristics_t));
   esp_adc_cal_characterize(ADC_UNIT_1, VIN_ATTEN, ADC_WIDTH_BIT_12, DEFAULT_VREF, adc_chars_vin);
   esp_adc_cal_characterize(ADC_UNIT_1, CURRENT_ATTEN, ADC_WIDTH_BIT_12, DEFAULT_VREF, adc_chars_current);
-  xTaskCreatePinnedToCore(loop, "Meter", 4000, NULL, 19, NULL, 0);
 }
 
 void Consumption::loop(void*)
 {
   while (1)
   {
-    /*uint32_t adc_vin = 0;
+    uint32_t adc_vin = 0;
     uint32_t adc_current = 0;
     //Multisampling
     for (int i = 0; i < ADC_NO_OF_SAMPLES; i++) {
@@ -40,7 +39,7 @@ void Consumption::loop(void*)
     uint32_t vin = adc_vin_calced*69;
     uint32_t current = adc_current_calced/0.02/33;
     float power = vin/1000.0*current;
-    Serial.printf("Raw34: %d     Raw36: %d     V34: %dmV     V36: %dmV     Vin: %dmV     I: %dmA     P: %.2fmW\n", adc_vin, adc_current, adc_vin_calced, adc_current_calced, vin, current, power);*/
+    Serial.printf("Raw34: %d     Raw36: %d     V34: %dmV     V36: %dmV     Vin: %dmV     I: %dmA     P: %.2fmW\n", adc_vin, adc_current, adc_vin_calced, adc_current_calced, vin, current, power);
     //Serial.printf("V: %dmV     I: %dmA     P: %dmW\n",getVoltage(),getCurrent(),getPower());
     delay(5000);
   }

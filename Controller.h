@@ -38,7 +38,6 @@ class Controller {
     static void adjustIntensity(uint16_t);
     static void setMode(uint8_t);
     static uint8_t getMode();
-    static void loop();
 
   private:
     static ColorMessage getFromMaxed(ColorMessage,uint16_t);
@@ -49,8 +48,6 @@ class Controller {
     static ColorMessage _color;
     static ColorMessage _maxed;
     static uint8_t _currentMode;
-    static bool _lightEN;
 };
 
 #endif
-

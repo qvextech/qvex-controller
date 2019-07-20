@@ -40,10 +40,6 @@
 //Enable MQTT [0,1]
 #define MQTT_EN Config::mqtt_enable
 
-//TCP
-#define TCP_EN 0
-#define TCP_PORT 6000
-
 //UDP
 #define UDP_EN 1
 #define UDP_PORT 7007

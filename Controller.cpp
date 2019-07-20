@@ -4,7 +4,6 @@
 #include "Settings.h"
 #include "HTTP.h"
 #include "MQTT.h"
-#include "TCP.h"
 #include "UDP.h"
 #include "Light.h"
 
@@ -12,22 +11,8 @@ ColorMessage Controller::_color = {0, 255, 0, 255, 255, 0, 0};// [unused,r,g,b,w
 ColorMessage Controller::_maxed = {0, 255, 0, 255, 255, 0, 0};// [unused,r,g,b,w,ww,intensity]
 bool Controller::_state = false;
 uint8_t Controller::_currentMode = MODE_DEF;
-bool Controller::_lightEN = true;
 
 // >>> Public methods <<<
-void Controller::loop()
-{
-  QHTTP::loop();
-  if (TCP_EN)TCP::loop();
-  if (UDP_EN)UDPsocket::loop();
-  if (MQTT_EN)MQTT::loop();
-
-  //Auto-brightness loop
-  if (LSENS_EN && _state && _lightEN && !LEDoutput::busy)adjustIntensity(Light::loop());
-  
-  delay(32);
-}
-
 void Controller::useColor(ColorMessage msg)
 {
   msg = Converter::convert(msg);
@@ -41,22 +26,21 @@ void Controller::useColor(ColorMessage msg)
 
 void Controller::state(bool new_state)
 {
-  _lightEN = false;
   if (new_state && !_state) // New state ON
   {
+    Light::pause = false;
     _state = true;
     ColorMessage msg = _color;
     msg.t = TRANS_T_DEF;
-    //Serial.println("Controller: outputing: " + String(msg.r) + "  " + String(msg.g) + "  " + String(msg.b) + "  " + String(msg.w) + "  " + String(msg.ww) + "  " + String(msg.t));
     LEDoutput::output(msg);
   }
   else if (!new_state && _state) // New state OFF
   {
+    Light::pause = true;
     _state = false;
     ColorMessage msg = {0, 0, 0, 0, 0, 0, TRANS_T_DEF};
     LEDoutput::output(msg);
   }
-  _lightEN = true;
 }
 void Controller::state(){state(!_state);}
 
@@ -65,12 +49,13 @@ void Controller::state(){state(!_state);}
 uint16_t Controller::getIntensity()
 {
   if(_state)return _maxed.t;
+  
   return 0;
 }
 
 void Controller::previewIntensity(uint16_t intensity)
 {
-  if(_lightEN == true)_lightEN = false; //Pause LSENS if not paused HERE
+  //Pause LSENS if not paused HERE
   LEDoutput::output(getFromMaxed(_maxed,intensity));
 }
 
@@ -88,14 +73,19 @@ void Controller::applyIntensity(uint16_t intensity) //Set new intensity
   {
     state(false);
   }
-  _lightEN = true; //Resume LSENS (colision alert)
+  //Resume LSENS (colision alert)
 }
 
 void Controller::adjustIntensity(uint16_t intensity) //Adjust currentely set intensity
 {
-  _maxed.t = intensity;
-  _color = getFromMaxed(_maxed);
-  LEDoutput::output(_color);
+  if(_state)
+  {
+    _maxed.t = intensity;
+    _color = getFromMaxed(_maxed);
+    ColorMessage msg = _color;
+    msg.t = 200;
+    if(!LEDoutput::busy)LEDoutput::output(msg);
+  }
 }
 
 //Controller mode methods
@@ -152,5 +142,3 @@ ColorMessage Controller::getFromMaxed(ColorMessage msg,uint16_t intensity)
   msg.t = 0;
   return msg;
 }
-
-

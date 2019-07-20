@@ -100,11 +100,11 @@ String Config::readFileAsJSON(String path){
 }
 
 bool Config::getBool(String string){
-  Serial.println("getBool of: "+string);
+  //Serial.println("getBool of: "+string);
   return (bool)string.toInt();
 }
 
 int Config::getInt(String string){
-  Serial.println("getInt of: "+string);
+  //Serial.println("getInt of: "+string);
   return string.toInt();
 }
