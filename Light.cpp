@@ -15,41 +15,41 @@ TaskHandle_t Light::_currentTask;
 bool Light::pause = true;
 
 void Light::calibrate(){
-  CHOUT chout;
+  ColorMessage msg;
 
-  chout.a = 0; chout.b = 0; chout.c = 0; chout.d = 0; chout.e = 0; chout.t = 0;
-  LEDoutput::applyCHOUT(chout);
+  msg.r = 0; msg.g = 0; msg.b = 0; msg.w = 0; msg.ww = 0; msg.t = 0;
+  LEDoutput::output(msg);
   uint16_t outsource;
   delay(50);
   _als.getALS(outsource);
-
-  chout.a = 255;
-  LEDoutput::applyCHOUT(chout);
+;
+  msg.r = 255;
+  LEDoutput::output(msg);
   delay(50);
   _als.getALS(_calibData.a);
 
-  chout.a = 0; chout.b = 255;
-  LEDoutput::applyCHOUT(chout);
+  msg.r = 0; msg.g = 255;
+  LEDoutput::output(msg);
   delay(50);
   _als.getALS(_calibData.b);
 
-  chout.b = 0; chout.c = 255;
-  LEDoutput::applyCHOUT(chout);
+  msg.g = 0; msg.b = 255;
+  LEDoutput::output(msg);
   delay(50);
   _als.getALS(_calibData.c);
 
-  chout.c = 0; chout.d = 255;
-  LEDoutput::applyCHOUT(chout);
+  msg.b = 0; msg.w = 255;
+  LEDoutput::output(msg);
   delay(50);
   _als.getALS(_calibData.d);
 
-  chout.d = 0; chout.e = 255;
-  LEDoutput::applyCHOUT(chout);
+  msg.w = 0; msg.ww = 255;
+  LEDoutput::output(msg);
   delay(50);
   _als.getALS(_calibData.e);
 
-  chout.e = 0;
-  LEDoutput::applyCHOUT(chout);
+  msg.ww = 0;
+  LEDoutput::output(msg);
 
   _calibData.a = max(_calibData.a,outsource) - min(_calibData.a,outsource);
   _calibData.b = max(_calibData.b,outsource) - min(_calibData.b,outsource);
@@ -125,7 +125,7 @@ uint16_t Light::getOutsource()
   uint16_t als;
   _als.getALS(als);
   raw = als;
-  CHOUT current = LEDoutput::getCurrentCHOUT();
+  CHOUT current = LEDoutput::getCurrentOutput();
 
   //Serial.println("Light: raw-wl: "+String(raw));
 

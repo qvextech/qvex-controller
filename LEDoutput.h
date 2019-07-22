@@ -12,21 +12,21 @@
 
 class LEDoutput{
     public:
-      static void output(ColorMessage);
+      static void output(ColorMessage, bool=true);
       static void output(byte[],uint16_t);
       static void begin();
       static bool busy;
-      static void applyCHOUT(CHOUT);
-      static CHOUT getCurrentCHOUT();
+      static CHOUT getCurrentOutput();
     private:
-      static void applyCHOUT(void*);
-      static void applyAddressable(void*);
+      static void outputTask(void*);
+      static void outputCode(ColorMessage);
+      static void applyCHOUT(CHOUT);
+      static void applyAddressable(ColorMessage);
       static void applyCHOUToverTime(CHOUT,CHOUT);
       static TaskHandle_t _currentTask;
       static NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod>* _addressableStrip;
-      static ColorMessage _addr_msg;
-      static CHOUT _classic_chout;
-      static CHOUT _stored_chout;
+      static ColorMessage _msg;
+      static CHOUT _stored_output;
 
 };
 

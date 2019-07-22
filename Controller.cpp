@@ -55,15 +55,18 @@ uint16_t Controller::getIntensity()
 
 void Controller::previewIntensity(uint16_t intensity)
 {
-  //Pause LSENS if not paused HERE
-  LEDoutput::output(getFromMaxed(_maxed,intensity));
+  if(!Light::pause)Light::pause = true; //Pause LSENS if not paused HERE
+  LEDoutput::output(getFromMaxed(_maxed,intensity),false);
 }
 
 void Controller::applyIntensity(uint16_t intensity) //Set new intensity
 {
   if(intensity > 4)
   {
-    if(!_state)_state=true;
+    if(!_state){
+      _state=true;
+      Light::pause = false;
+    }
     _maxed.t = intensity;
     _color = getFromMaxed(_maxed);
     LEDoutput::output(_color);
@@ -73,7 +76,7 @@ void Controller::applyIntensity(uint16_t intensity) //Set new intensity
   {
     state(false);
   }
-  //Resume LSENS (colision alert)
+  Light::pause = false; //Resume LSENS
 }
 
 void Controller::adjustIntensity(uint16_t intensity) //Adjust currentely set intensity
@@ -83,8 +86,8 @@ void Controller::adjustIntensity(uint16_t intensity) //Adjust currentely set int
     _maxed.t = intensity;
     _color = getFromMaxed(_maxed);
     ColorMessage msg = _color;
-    msg.t = 200;
-    if(!LEDoutput::busy)LEDoutput::output(msg);
+    msg.t = 2000;
+    if(!LEDoutput::busy && !Light::pause)LEDoutput::output(msg);
   }
 }
 

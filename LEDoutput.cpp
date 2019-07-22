@@ -8,9 +8,8 @@
 NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod>* LEDoutput::_addressableStrip = NULL;
 
 TaskHandle_t LEDoutput::_currentTask;
-ColorMessage LEDoutput::_addr_msg;
-CHOUT LEDoutput::_classic_chout;
-CHOUT LEDoutput::_stored_chout = {0,0,0,0,0,0};
+ColorMessage LEDoutput::_msg;
+CHOUT LEDoutput::_stored_output = {0,0,0,0,0,0};
 bool LEDoutput::busy = false;
 
 void LEDoutput::begin()
@@ -40,9 +39,32 @@ void LEDoutput::begin()
   }
 }
 
-void LEDoutput::output(ColorMessage msg)
+void LEDoutput::output(ColorMessage msg, bool runInTask)
 {
-  Serial.println("Output: outputing: " + String(msg.r) + "  " + String(msg.g) + "  " + String(msg.b) + "  " + String(msg.w) + "  " + String(msg.ww));
+  _msg = msg;
+  if(runInTask){
+    if(busy)vTaskDelete(_currentTask);
+    xTaskCreatePinnedToCore(outputTask, "LEDout:output", 5000, &_msg, 19, &_currentTask, 0);
+  }
+  else {
+    busy = true;
+    outputCode(msg);
+    busy = false;
+  }
+}
+
+void LEDoutput::outputTask(void*data)
+{
+  busy = true;
+  ColorMessage msg = *(ColorMessage *) data;
+  outputCode(msg);
+  busy = false;
+  vTaskDelete(NULL);
+}
+
+void LEDoutput::outputCode(ColorMessage msg)
+{
+  Serial.println("Output: outputing: " + String(msg.r) + "  " + String(msg.g) + "  " + String(msg.b) + "  " + String(msg.w) + "  " + String(msg.ww) + " t: " + String(msg.t));
   int stripType = STRIP_TYPE;
   switch (stripType)
   {
@@ -53,18 +75,15 @@ void LEDoutput::output(ColorMessage msg)
     case 3:
     case 4:
     case 5:
-      _classic_chout = Converter::mapChannels(msg);
-      _classic_chout.t = msg.t;
-      xTaskCreatePinnedToCore(applyCHOUT, "LEDout:apply", 5000, &_classic_chout, 19, &_currentTask, 0);
+      applyCHOUT(Converter::mapChannels(msg));
       break;
     case 14:
-      _addr_msg = msg;
-      xTaskCreatePinnedToCore(applyAddressable, "LEDout:applyAddr", 5000, &_addr_msg, 19, &_currentTask, 0);
+      applyAddressable(msg);
       break;
     default:
       Serial.println("LEDoutput: unknown strip type: " + String(stripType));
       break;
-  }
+  };
 }
 
 void LEDoutput::output(byte data[],uint16_t length)
@@ -88,15 +107,11 @@ void LEDoutput::output(byte data[],uint16_t length)
 
 
 
-void LEDoutput::applyAddressable(void*data)
+void LEDoutput::applyAddressable(ColorMessage msg)
 {
-  busy = true;
-  long mic1, mic2;
-  ColorMessage msg = *(ColorMessage *) data;
   Serial.println("Output: addressable: " + String(msg.r) + "  " + String(msg.g) + "  " + String(msg.b) + "  " + String(msg.w) + "  " + String(msg.ww) + "  " + String(msg.t));
   RgbColor color(msg.r, msg.g, msg.b);
   int pixelCount = ADDRESSABLE_LED_NUM;
-  mic1 = micros();
   switch (msg.t)
   {
     case 0:
@@ -117,36 +132,26 @@ void LEDoutput::applyAddressable(void*data)
       }
       break;
   }
-  mic2 = micros();
-  busy = false;
-  vTaskDelete(NULL);
-}
-
-void LEDoutput::applyCHOUT(void*data)
-{
-  busy = true;
-  CHOUT chout = *(CHOUT *) data;
-  applyCHOUT(chout);
-  vTaskDelete(NULL);
+  _stored_output.a = msg.r; _stored_output.b = msg.g; _stored_output.c = msg.b; _stored_output.d = msg.w; _stored_output.e = msg.ww;
 }
 
 void LEDoutput::applyCHOUT(CHOUT chout)
 {
-  busy = true;
-  if(chout.t != 0)applyCHOUToverTime(_stored_chout, chout);
+  if(chout.t != 0)applyCHOUToverTime(_stored_output, chout);
   ledcWrite(1, chout.a);
   ledcWrite(2, chout.b);
   ledcWrite(3, chout.c);
   ledcWrite(4, chout.d);
   ledcWrite(5, chout.e);
-  _stored_chout = chout;
-  busy = false;
+  _stored_output = chout;
 }
 
 
 
 void LEDoutput::applyCHOUToverTime(CHOUT from, CHOUT to)
 {
+  CHOUT chout;
+  chout.t = 0;
   float ticks = to.t/16.0;
   float diff_a = (to.a-from.a)/ticks;
   float diff_b = (to.b-from.b)/ticks;
@@ -155,16 +160,17 @@ void LEDoutput::applyCHOUToverTime(CHOUT from, CHOUT to)
   float diff_e = (to.e-from.e)/ticks;
   for (int i = 1; i <= ticks; ++i)
   {
-    ledcWrite(1, from.a+diff_a*i);
-    ledcWrite(2, from.b+diff_b*i);
-    ledcWrite(3, from.c+diff_c*i);
-    ledcWrite(4, from.d+diff_d*i);
-    ledcWrite(5, from.e+diff_e*i);
+    chout.a = from.a+diff_a*i;
+    chout.b = from.b+diff_b*i;
+    chout.c = from.c+diff_c*i;
+    chout.d = from.d+diff_d*i;
+    chout.e = from.e+diff_e*i;
+    applyCHOUT(chout);
     delay(16);
   }
 }
 
-CHOUT LEDoutput::getCurrentCHOUT()
+CHOUT LEDoutput::getCurrentOutput()
 {
-  return _stored_chout;
+  return _stored_output;
 }
