@@ -90,7 +90,7 @@ void Controller::adjustIntensity(uint16_t intensity) //Adjust currentely set int
     _maxed.t = intensity;
     _color = getFromMaxed(_maxed);
     ColorMessage msg = _color;
-    msg.t = 2000;
+    msg.t = 300;
     if(!LEDoutput::busy && !Light::pause)LEDoutput::output(msg);
   }
 }
