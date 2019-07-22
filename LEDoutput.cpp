@@ -47,6 +47,7 @@ void LEDoutput::output(ColorMessage msg, bool runInTask)
     xTaskCreatePinnedToCore(outputTask, "LEDout:output", 5000, &_msg, 19, &_currentTask, 0);
   }
   else {
+    if(busy)vTaskDelete(_currentTask);
     busy = true;
     outputCode(msg);
     busy = false;
