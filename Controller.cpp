@@ -30,6 +30,10 @@ void Controller::state(bool new_state)
   {
     Light::pause = false;
     _state = true;
+    if(LSENS_EN){
+      _maxed.t = Light::getIfromValue(Light::getAvgOutsource(4));
+      _color = getFromMaxed(_maxed);
+    }
     ColorMessage msg = _color;
     msg.t = TRANS_T_DEF;
     LEDoutput::output(msg);

@@ -22,8 +22,8 @@ class Light{
     static void adjust(CHOUT);
     static void calibrate();
     static bool pause;
-  private:
     static int16_t getIfromValue(uint16_t);
+  private:
     static void code_loop(void*);
     static VEML7700 _als;
     static int32_t _low;
