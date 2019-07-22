@@ -77,7 +77,7 @@ void Light::code_loop(void*)
 {
   while(1)
   {
-    if(!pause)Controller::adjustIntensity(getIfromValue(getAvgOutsource()));
+    if(!pause)Controller::adjustIntensity(getIfromValue(getAvgOutsource(50)));
     delay(2000);
   }
   vTaskDelete(NULL);
@@ -100,15 +100,15 @@ void Light::set(int16_t intensity)
   Serial.println("Light: initL: "+String(initL)+" low: "+String(_low)+" high: "+String(_high));
 }
 
-uint16_t Light::getAvgOutsource()
+uint16_t Light::getAvgOutsource(uint8_t samples)
 {
   uint32_t avg = 0;
-  for(int i = 0;i<50;i++)
+  for(int i = 0;i<samples;i++)
   {
     avg += getOutsource();
-    delay(26);
+    delay(25);
   }
-  avg /= 50;
+  avg /= samples;
   return (uint16_t)avg;
 }
 

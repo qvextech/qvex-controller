@@ -17,7 +17,7 @@ class Light{
     static int16_t loop();
     static void set(int16_t);
     static uint16_t getOutsource(); //Returns raw uint16_t full range
-    static uint16_t getAvgOutsource(); //Returns 50-sample averaged outsource value
+    static uint16_t getAvgOutsource(uint8_t); //Returns averaged outsource value
     static uint32_t getOutsourceLux(); //Returns mililux
     static void adjust(CHOUT);
     static void calibrate();
