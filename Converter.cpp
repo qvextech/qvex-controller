@@ -87,6 +87,7 @@ ColorMessage Converter::convert(ColorMessage msg) {
 CHOUT Converter::mapChannels(ColorMessage msg)
 {
   CHOUT chout;
+  chout.t = msg.t;
   int strip = STRIP_TYPE;
   switch (strip)
   {
